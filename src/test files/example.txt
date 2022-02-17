@@ -1,0 +1,11 @@
+([{
+            'email': 'ndevbogado@gmail.com',
+            'password': 'Kratos_XD97'
+        },
+
+{
+            'email': 'nahuelbogado97@hotmail.com',
+            'password': 'Kratos_XD97'
+        }
+]
+)
