@@ -22,7 +22,7 @@ const userSchema = new Schema  ({
         trim: true
     },
     
-    nivel: {
+    rol: {
         type: String,
         required: true,
         trim: true
