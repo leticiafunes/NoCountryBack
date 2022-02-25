@@ -1,24 +1,18 @@
 const usersCtrl = {};
 const User = require("../models/User");
 
-import User, {
-  findOne,
-  find,
-  findByIdAndDelete,
-  findById,
-  findOneAndUpdate,
-} from "../models/User";
 
 //User Sign Up 
 
 usersCtrl.createUser = async (req, res) => {
   let messages = [];
 
-  const { username, nombre, apellido, password, confirm_password } = req.body;
+  const { username, email, name, lastname, password, confirm_password } = req.body;
 
   if (password != confirm_password) {
     messages.push({ type: "error", text: "Las claves no coinciden" });
   }
+
   if (password.length < 4) {
     messages.push({
       type: "error",
@@ -26,11 +20,13 @@ usersCtrl.createUser = async (req, res) => {
     });
   }
   if (messages.length > 0) {
+    
     const user_errors = {
       messages: messages,
       username: username,
-      nombre: nombre,
-      apellido: apellido,
+      email: email,
+      name: name,
+      lastname: surname,
       password: password,
       confirm_password: confirm_password,
     };
@@ -39,20 +35,47 @@ usersCtrl.createUser = async (req, res) => {
   } else {
     // Existe el usuario?
 
-    const userName = await findOne({ username: username });
+    const userName = await findOne({ email: email });
 
     if (userName) {
-      messages.push({ type: "error", text: "El usuario ya existe." });
+      messages.push({ type: "error", text: "Duplicated user" });
       res.json(messages);
     } else {
       // Save New User
-      const rol = "Lector";
-      const newUser = new User({ username, nombre, apellido, password, rol });
+      const role = "reader";
+      const newUser = new User({ username, email, name, lastname, password, role });
       newUser.password = await newUser.encryptPassword(password);
-      await newUser.save();
-      messages.push({ type: "error", text: "Usuario registrado." });
+      
+      
+       await newUser.save ((err)  => {
+
+        if (err) return res.sttus (500).send({message: `Error creating user: ${err}`})
+        return res.status (201).send ({token: service.createToken (newUser)})
+      })
+      
+      
+      
+      messages.push({ type: "ok", text: "User registered." });
     }
   }
+};
+
+
+usersCtrl.sign_in = async (req, res) => {
+ 
+ 
+ 
+  const user = await User.find({email: req.body.email}, (err, user) => {
+   if (err) res.sttus (500).send({message: `Error : : ${err}`})
+   if (!user) res.status (404).send({message: `User not found`})
+
+   req.user = user
+   res.status (200).send ({message: 'You are accepted'}) 
+
+  });
+  res.json(users);
+
+
 };
 
 
@@ -80,18 +103,21 @@ usersCtrl.getUserByUsername = async (req, res) => {
 };
 
 usersCtrl.updateUser = async (req, res) => {
-  const { username, nombre, apellido, password, rol } = req.body;
+  const { username, email, name, lastname, password, role } = req.body;
   const filter = { _id: req.params.id };
   const user = await findOneAndUpdate(filter, {
     username: username,
-    nombre: nombre,
-    apellido: apellido,
+    email: email, 
+    name: name,
+    lastname: lastname,
     password: password,
     confirm_password: confirm_password,
-    rol: rol
+    role: role
   });
 
   res.json(user);
 };
 
-export default usersCtrl;
+
+module.exports = usersCtrl;
+

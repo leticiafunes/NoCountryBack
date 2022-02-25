@@ -12,9 +12,12 @@ app.use (cors()); //cors hace q dos servidores se conecten entre ellos (back y f
 app.use (express.json()); //para q las rutas entiendan json y strings
 
 
+
 //routes
 
 app.use ('/api/users', require ('./routes/users')); 
+
+
 
 
 module.exports = app;
