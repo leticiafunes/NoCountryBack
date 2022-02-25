@@ -1,19 +1,19 @@
 const {Router} = require ('express');
 const router = Router();
-const { getUsers,  deleteUser, getUser, createUser, updateUser, getUserByUsername} = require('../controllers/users.controller');
+const { getUsers,  deleteUser, getUser, createUser, updateUser, getUserByUsername ,login} = require('../controllers/users.controller');
 const auth = require ('../middlewares/auth')
 
 router.route ('/')
-//.get ((req, res) => res.send ('user routes') )
+//get ((req, res) => res.send ('Usuarios') )
 
 
 .get (getUsers)
-
-
-//.post ((req, res) => res.send ('POST user routes') )
-
 .post (createUser )
 
+
+router.route ('/login')
+
+.post (login)
 
 
 
@@ -30,7 +30,7 @@ router.route ('/userbyusername/:id')
 
 
 router.route ('/private', auth.isAuth, (req, res) => {
-    res.status (200).sen ({message: 'access allowed'})
+    res.status (200).send ({message: 'access allowed'})
 })
 
 module.exports = router;

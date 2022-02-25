@@ -40,8 +40,10 @@ const userSchema = new Schema  ({
     );
 
 userSchema.methods.encryptPassword = async password => {
-    const salt = await bcrypt.genSalt (10);
-    return await bcrypt.compare (password, salt);
+  
+    const salt = await bcrypt.genSalt(10);
+    const pass = await bcrypt.hash(password, salt);
+    return pass;
 
 }
 

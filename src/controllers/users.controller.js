@@ -1,5 +1,7 @@
 const usersCtrl = {};
+const { TokenExpiredError } = require("jsonwebtoken");
 const User = require("../models/User");
+const token = require("../services/Token");
 
 
 //User Sign Up 
@@ -35,7 +37,7 @@ usersCtrl.createUser = async (req, res) => {
   } else {
     // Existe el usuario?
 
-    const userName = await findOne({ email: email });
+    const userName = await User.findOne({ email: email });
 
     if (userName) {
       messages.push({ type: "error", text: "Duplicated user" });
@@ -49,19 +51,23 @@ usersCtrl.createUser = async (req, res) => {
       
        await newUser.save ((err)  => {
 
-        if (err) return res.sttus (500).send({message: `Error creating user: ${err}`})
-        return res.status (201).send ({token: service.createToken (newUser)})
+        if (err) return res.status (500).send({message: `Error creating user: ${err}`})
+       
+        messages.push({ type: "ok", text: "User registered." });
+
+        return res.status (201).send ({messages: messages, token: token.createToken (newUser)})
+
       })
       
       
       
-      messages.push({ type: "ok", text: "User registered." });
+     
     }
   }
 };
 
 
-usersCtrl.sign_in = async (req, res) => {
+usersCtrl.login = async (req, res) => {
  
  
  
@@ -73,7 +79,9 @@ usersCtrl.sign_in = async (req, res) => {
    res.status (200).send ({message: 'You are accepted'}) 
 
   });
-  res.json(users);
+
+
+  res.json(user);
 
 
 };
@@ -87,7 +95,7 @@ usersCtrl.getUsers = async (req, res) => {
 
 
 usersCtrl.deleteUser = async (req, res) => {
-  await findByIdAndDelete(req.params.id);
+  await User.findByIdAndDelete(req.params.id);
   res.json({ message: ["Usuario Borrado. Id: " + req.params.id] });
 };
 
@@ -103,20 +111,67 @@ usersCtrl.getUserByUsername = async (req, res) => {
 };
 
 usersCtrl.updateUser = async (req, res) => {
-  const { username, email, name, lastname, password, role } = req.body;
-  const filter = { _id: req.params.id };
-  const user = await findOneAndUpdate(filter, {
-    username: username,
-    email: email, 
-    name: name,
-    lastname: lastname,
-    password: password,
-    confirm_password: confirm_password,
-    role: role
-  });
+ 
+  let messages = [];
 
-  res.json(user);
+  const { username, email, name, lastname, password, confirm_password } = req.body;
+  const filter = { _id: req.params.id };
+
+  if (password != confirm_password) {
+    messages.push({ type: "error", text: "Las claves no coinciden" });
+  }
+
+  if (password.length < 4) {
+    messages.push({
+      type: "error",
+      text: "La clave tiene que tener al menos 4 caracteres",
+    });
+  }
+  if (messages.length > 0) {
+    
+    const user_errors = {
+      messages: messages,
+      username: username,
+      email: email,
+      name: name,
+      lastname: surname,
+      password: password,
+      confirm_password: confirm_password,
+    };
+
+    res.json(user_errors);
+  } else {
+    // Existe el usuario?
+
+    const userName = await User.findOne({ email: email });
+
+    if (userName) {
+      messages.push({ type: "error", text: "Duplicated user" });
+      res.json(messages);
+    } else {
+      // Save New User
+      const role = "reader";
+      const newUser = new User({ username, email, name, lastname, password, role });
+      newUser.password = await newUser.encryptPassword(password);
+      
+      try{
+      const result = await User.findOneAndUpdate (filter, {newUser});
+        
+      } catch(err){
+         if (err) return res.status (500).send({message: `Error creating user: ${err}`})
+      } 
+
+      
+      messages.push({ type: "ok", text: "User updated." });
+     
+      return res.status (201).send ({messages: messages, token: token.createToken (newUser)});
+
+      }
+     
+  }
 };
+
+
 
 
 module.exports = usersCtrl;
