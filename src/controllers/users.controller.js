@@ -111,11 +111,10 @@ usersCtrl.getUserByUsername = async (req, res) => {
 };
 
 usersCtrl.updateUser = async (req, res) => {
- 
   let messages = [];
-
-  const { username, email, name, lastname, password, confirm_password } = req.body;
   const filter = { _id: req.params.id };
+
+  const { username, email, name, lastname, password, confirm_password, role } = req.body;
 
   if (password != confirm_password) {
     messages.push({ type: "error", text: "Las claves no coinciden" });
@@ -141,35 +140,37 @@ usersCtrl.updateUser = async (req, res) => {
 
     res.json(user_errors);
   } else {
-    // Existe el usuario?
-
-    const userName = await User.findOne({ email: email });
-
-    if (userName) {
-      messages.push({ type: "error", text: "Duplicated user" });
-      res.json(messages);
-    } else {
-      // Save New User
-      const role = "reader";
+     
+    // Edit User
       const newUser = new User({ username, email, name, lastname, password, role });
-      newUser.password = await newUser.encryptPassword(password);
-      
-      try{
-      const result = await User.findOneAndUpdate (filter, {newUser});
-        
-      } catch(err){
-         if (err) return res.status (500).send({message: `Error creating user: ${err}`})
-      } 
 
-      
-      messages.push({ type: "ok", text: "User updated." });
-     
-      return res.status (201).send ({messages: messages, token: token.createToken (newUser)});
+  
+      const newpassword = await newUser.encryptPassword(password);
 
-      }
-     
+   
+
+      const result = User.findOneAndUpdate (filter, {username, email, name, lastname, newpassword, role}, 
+        (err, {username, email, name, lastname, password, role}) => {
+        if (err) return res.status (500).send({message: `Error creating user: ${err}`})
+        messages.push({ type: "ok", text: "User updated." });
+        res.json(messages);
+      });
+    
+    
+  
+      
+      
+
   }
+  
 };
+
+
+
+
+
+
+
 
 
 
