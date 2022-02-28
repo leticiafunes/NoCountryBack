@@ -3,6 +3,8 @@ const app = express();
 const cors  = require ('cors');
 
 
+require('passport')
+
 
 //settings - - -
 app.set ('port', process.env.PORT || 4001);
@@ -15,10 +17,14 @@ app.use (express.json()); //para q las rutas entiendan json y strings
 
 //routes
 
-app.use ('/api/users', require ('./routes/users')); 
+const auth = require('./routes/auth');
+const users = require('./routes/users');
 
-
-
+app.use('/auth', auth);
+//app.use ('/api/users', passport.authenticate('jwt', {session: false}), users); 
+app.use ('/api/users', users); 
 
 module.exports = app;
+
+
 

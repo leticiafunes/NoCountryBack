@@ -1,15 +1,17 @@
 const usersCtrl = {};
-const { TokenExpiredError } = require("jsonwebtoken");
 const User = require("../models/User");
-const token = require("../services/Token");
+
+const passport = require('passport')
+const jwt = require('jsonwebtoken')
 
 
-//User Sign Up 
+//User Sign Up
 
 usersCtrl.createUser = async (req, res) => {
   let messages = [];
 
-  const { username, email, name, lastname, password, confirm_password } = req.body;
+  const { username, email, name, lastname, password, confirm_password } =
+    req.body;
 
   if (password != confirm_password) {
     messages.push({ type: "error", text: "Las claves no coinciden" });
@@ -22,7 +24,6 @@ usersCtrl.createUser = async (req, res) => {
     });
   }
   if (messages.length > 0) {
-    
     const user_errors = {
       messages: messages,
       username: username,
@@ -45,54 +46,70 @@ usersCtrl.createUser = async (req, res) => {
     } else {
       // Save New User
       const role = "reader";
-      const newUser = new User({ username, email, name, lastname, password, role });
+      const newUser = new User({
+        username,
+        email,
+        name,
+        lastname,
+        password,
+        role,
+      });
       newUser.password = await newUser.encryptPassword(password);
-      
-      
-       await newUser.save ((err)  => {
 
-        if (err) return res.status (500).send({message: `Error creating user: ${err}`})
-       
+      await newUser.save((err) => {
+        if (err)
+          return res
+            .status(500)
+            .send({ message: `Error creating user: ${err}` });
+
         messages.push({ type: "ok", text: "User registered." });
 
-        return res.status (201).send ({messages: messages, token: token.createToken (newUser)})
-
-      })
-      
-      
-      
-     
+        return res
+          .status(201)
+          .send({ messages: messages, token: token.createToken(newUser) });
+      });
     }
   }
 };
 
+usersCtrl.login = async (req, res, next) => {
+  passport.authenticate('login', async (err, user, info) => {
+    try {
+      if (err || !user) {
+        console.log(err)
+        const error = new Error('new Error')
+        return next(error)
+      }
 
-usersCtrl.login = async (req, res) => {
- 
- 
- 
-  const user = await User.find({email: req.body.email}, (err, user) => {
-   if (err) res.sttus (500).send({message: `Error : : ${err}`})
-   if (!user) res.status (404).send({message: `User not found`})
+      req.login(user, { session: false }, async (err) => {
+        if (err) return next(err)
+        const body = { _id: user._id, email: user.email }
 
-   req.user = user
-   res.status (200).send ({message: 'You are accepted'}) 
-
-  });
-
-
-  res.json(user);
+        const token = jwt.sign({ user: body }, 'top_secret')
+        return res.json({ token })
+      })
+    }
+    catch(e) {
+      return next(e)
+    }
+  })(req, res, next)
+}
 
 
-};
+
+
+
+
+
+
+
+
 
 
 usersCtrl.getUsers = async (req, res) => {
   const users = await User.find();
   res.json(users);
 };
-
-
 
 usersCtrl.deleteUser = async (req, res) => {
   await User.findByIdAndDelete(req.params.id);
@@ -114,7 +131,8 @@ usersCtrl.updateUser = async (req, res) => {
   let messages = [];
   const filter = { _id: req.params.id };
 
-  const { username, email, name, lastname, password, confirm_password, role } = req.body;
+  const { username, email, name, lastname, password, confirm_password, role } =
+    req.body;
 
   if (password != confirm_password) {
     messages.push({ type: "error", text: "Las claves no coinciden" });
@@ -127,7 +145,6 @@ usersCtrl.updateUser = async (req, res) => {
     });
   }
   if (messages.length > 0) {
-    
     const user_errors = {
       messages: messages,
       username: username,
@@ -140,40 +157,31 @@ usersCtrl.updateUser = async (req, res) => {
 
     res.json(user_errors);
   } else {
-     
     // Edit User
-      const newUser = new User({ username, email, name, lastname, password, role });
+    const newUser = new User({
+      username,
+      email,
+      name,
+      lastname,
+      password,
+      role,
+    });
 
-  
-      const newpassword = await newUser.encryptPassword(password);
+    const newpassword = await newUser.encryptPassword(password);
 
-   
-
-      const result = User.findOneAndUpdate (filter, {username, email, name, lastname, newpassword, role}, 
-        (err, {username, email, name, lastname, password, role}) => {
-        if (err) return res.status (500).send({message: `Error creating user: ${err}`})
+    const result = User.findOneAndUpdate(
+      filter,
+      { username, email, name, lastname, newpassword, role },
+      (err, { username, email, name, lastname, password, role }) => {
+        if (err)
+          return res
+            .status(500)
+            .send({ message: `Error creating user: ${err}` });
         messages.push({ type: "ok", text: "User updated." });
         res.json(messages);
-      });
-    
-    
-  
-      
-      
-
+      }
+    );
   }
-  
 };
 
-
-
-
-
-
-
-
-
-
-
 module.exports = usersCtrl;
-

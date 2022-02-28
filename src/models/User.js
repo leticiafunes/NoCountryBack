@@ -1,11 +1,10 @@
 const {Schema, model} = require ('mongoose'); 
-const bcrypt = require ('bcryptjs');
+const bcrypt = require ('bcryptjs'); //Encriptar las contraseñas
 
 const userSchema = new Schema  ({
    
     username: {
         type: String,
-        required: true,
         trim: true
        
     }, 
@@ -32,25 +31,25 @@ const userSchema = new Schema  ({
     
     role: {
         type: String,
-        required: true,
         trim: true
     }},
     { timestamps: true}
     
     );
 
-userSchema.methods.encryptPassword = async password => {
-  
-    const salt = await bcrypt.genSalt(10);
-    const pass = await bcrypt.hash(password, salt);
-    return pass;
 
-}
+   /*Hook: Se ejecuta antes de crear un nuevo usuario*/
 
-
-//Compara datos cifrados...no strings. Si hay algún dato de prueba sin cifrar guardado dará error.
-userSchema.methods.matchPassword = async function (password) {
-    return await bcrypt.compare(password, password);
-};
+    userSchema.pre('save', async function (next) {
+        const hash = await bcrypt.hash(this.password, 10)
+        this.password = hash
+        next()
+    })
+    
+    userSchema.methods.isValidPassword = async function(password) {
+        const user = this;
+        const compare = await bcrypt.compare(password, user.password)
+        return compare
+    }
 
 module.exports =  model ('User', userSchema);

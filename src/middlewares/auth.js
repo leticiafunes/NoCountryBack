@@ -1,30 +1,57 @@
-const jwt = require('jsonwebtoken');
-const moment = require ('moment');
-const config = require ('../config')
+//passport.js
 
+/*Now, we’ll create a middleware, that allows only requests 
+with valid tokens to access some special routes needing authentication, 
+eg. /user/profile. For this, we will use the passport-jwt strategy. We’ll add it in our passport.js file*/
 
-function isAuth (req, res, next) {
-   if (!req.headers.authorization){
-       return res.status (403).send ({message: 'No authorization'})
-   }
+const passport = require('passport')
+const localStrategy = require('passport-local').Strategy  //no se loguea con redes
+const User = require('../models/User')
 
-   const token = req.headers.authorization.split ("")[1]; //en el segundo elemento del array está el token. 
-   const payload = jwt.decode (token, config.SECRET_TOKEN)
+const JWTStrategy = require('passport-jwt').Strategy
+const ExtractJWT = require('passport-jwt').ExtractJwt
 
+passport.use('signup', new localStrategy({
+    usernameField: 'email',
+    passwordField: 'password'
+}, async (email, password, done) => {
+    try {
+        const user = await User.create({ email, password })
+        return done(null, user)
+    } catch (e) {
+        done(e)
+    }
+}))
 
+passport.use('login', new localStrategy({
+    usernameField: 'email',
+    passwordField: 'password',
+}, async (email, password, done) => {
+    try {
+        const user = await User.findOne({ email })
+        if (!user) {
+            return done(null, false, { message: 'User not found' })
+        }
 
-//Vemos si el token no ha caducado
+        const validate = await user.isValidPassword(password)
 
-if (payload.exp <= moment().unix()) {
-    return res.status (401).send ({message: 'Token expired'})
-}
+        if (!validate) {
+            return done(null, false, { message: 'Wrong password' })
+        }
 
-req.user = payload.sub 
-next()
+        return done(null, user, { message: 'Login successfull' })
+    } catch (e) {
+        return done(e)
+    }
+}))
 
-}
-
-module.exports  = isAuth
-
-
-
+passport.use(new JWTStrategy({
+    secretOrKey: process.env.CLAVE_ESTRATEGIA_LOCAL,
+    jwtFromRequest: ExtractJWT.fromHeader(process.env.LLAVE_ESTRATEGIA_LOCAL)
+}, async (token, done) => {
+    try {
+        return done(null, token.user)
+    } catch (e) {
+        done(error)
+    }
+}))

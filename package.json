@@ -21,6 +21,7 @@
     "moment": "^2.29.1",
     "mongoose": "^6.1.5",
     "passport": "^0.5.2",
+    "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0"
   },
   "devDependencies": {
