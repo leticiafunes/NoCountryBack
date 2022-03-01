@@ -1,8 +1,8 @@
 const usersCtrl = {};
 const User = require("../models/User");
-
 const passport = require('passport')
 const jwt = require('jsonwebtoken')
+const auth = require ('../middlewares/auth')
 
 
 //User Sign Up
@@ -29,7 +29,7 @@ usersCtrl.createUser = async (req, res) => {
       username: username,
       email: email,
       name: name,
-      lastname: surname,
+      lastname: lastname,
       password: password,
       confirm_password: confirm_password,
     };
@@ -54,7 +54,7 @@ usersCtrl.createUser = async (req, res) => {
         password,
         role,
       });
-      newUser.password = await newUser.encryptPassword(password);
+      //newUser.password = await newUser.encryptPassword(password);
 
       await newUser.save((err) => {
         if (err)
@@ -63,30 +63,44 @@ usersCtrl.createUser = async (req, res) => {
             .send({ message: `Error creating user: ${err}` });
 
         messages.push({ type: "ok", text: "User registered." });
-
-        return res
-          .status(201)
-          .send({ messages: messages, token: token.createToken(newUser) });
+        return res.json({ messages})
+        
       });
     }
   }
 };
 
 usersCtrl.login = async (req, res, next) => {
+
+  
+  const { email, pass } = req.body;
+
+  console.log ("email: " +email);
+  console.log ("pass: " + pass);
+  console.log ( "req:" + req);
+
+
   passport.authenticate('login', async (err, user, info) => {
     try {
+      
+  
+
       if (err || !user) {
-        console.log(err)
+        console.log(user)
         const error = new Error('new Error')
+        console.log (err);
         return next(error)
       }
+      else {
+        console.log ("Usuario Existe");
+      }
 
+      //Passport exposes a login() function on req (also aliased as logIn()) that can be used to establish a login session.
       req.login(user, { session: false }, async (err) => {
         if (err) return next(err)
         const body = { _id: user._id, email: user.email }
-
         const token = jwt.sign({ user: body }, 'top_secret')
-        return res.json({ token })
+        return res.json({ "user_token:" : token })
       })
     }
     catch(e) {
@@ -94,15 +108,6 @@ usersCtrl.login = async (req, res, next) => {
     }
   })(req, res, next)
 }
-
-
-
-
-
-
-
-
-
 
 
 
@@ -150,7 +155,7 @@ usersCtrl.updateUser = async (req, res) => {
       username: username,
       email: email,
       name: name,
-      lastname: surname,
+      lastname: lastname,
       password: password,
       confirm_password: confirm_password,
     };

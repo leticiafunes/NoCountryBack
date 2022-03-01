@@ -1,8 +1,9 @@
-const mongoose = require ('mongoose')
-
 const User = require("../models/User");
+const passport = require('passport')
+const jwt = require('jsonwebtoken')
 
-const service = require (('../services'))
+
+
 
 function signUp (req, res) {
     const user = new User({
@@ -16,9 +17,38 @@ function signUp (req, res) {
     })
 }
 
+const signIn = async (req, res, next) => {
 
-function signIn (req, res) {
-    
+
+  
+
+  passport.authenticate('signin', async (err, user, info) => {
+    try {
+      if (err || !user) {
+        console.log(err)
+        const error = new Error('new Error')
+        return next(error)
+      }
+
+      //Passport exposes a login() function on req (also aliased as logIn()) that can be used to establish a login session.
+      req.login(user, { session: false }, async (err) => {
+        if (err) return next(err)
+        const body = { _id: user._id, email: user.email }
+        const token = jwt.sign({ user: body }, process.env.CLAVE_ESTRATEGIA_LOCAL)
+        return res.json({ "user_token:" : token })
+      })
+    }
+    catch(e) {
+      return next(e)
+    }
+  })(req, res, next)
 }
+
+
+
+
+
+
+
 
 module.exports = {signUp, signIn} 

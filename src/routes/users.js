@@ -18,6 +18,7 @@ router.route ('/')
 router.route ('/login')
 .post (login)
 
+
 router.route ('/:id')
 .get (passport.authenticate('jwt', { session: false }),getUser)
 .delete (passport.authenticate('jwt', { session: false }), deleteUser )

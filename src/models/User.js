@@ -52,4 +52,23 @@ const userSchema = new Schema  ({
         return compare
     }
 
+
+    userSchema.methods.encryptPassword = async password => {
+        const salt = await bcrypt.genSalt (10);
+        return await bcrypt.compare (password, salt);
+    
+    }
+    
+    
+    //Compara datos cifrados...no strings. Si hay algún dato de prueba sin cifrar guardado dará error.
+    userSchema.methods.matchPassword = async function (password) {
+        const user = this;
+        return await bcrypt.compare(password, user.password);
+    };
+
+
+
+
+
+
 module.exports =  model ('User', userSchema);
