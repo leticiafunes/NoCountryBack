@@ -21,12 +21,26 @@ app.use(express.json());
 
 mongoose.connect('mongodb://localhost:27017/UserDB');
 
+// USERS SCHEMA -------------------------------------- 
+
 const UserSchema = new mongoose.Schema({
     'email': String,
     'password': String
 });
 
 const User = mongoose.model('user', UserSchema);
+
+// POST SCHEMA -------------------------------------- 
+
+const PostSchema = new mongoose.Schema({
+    'title': String,
+    'date': Date,
+    'isPublicity': Boolean,
+    'message': String,
+    'components': Array
+});
+
+const NewPost = mongoose.model('post', PostSchema);
 
 // SERVER FUNCTIONALITIES ####################################
 
@@ -55,6 +69,7 @@ app.route('/signup')
 
             const user = {
                 'email': userEmail,
+                'date': Date,
                 'password': hashedPassword
             }
             
@@ -150,6 +165,82 @@ app.route('/login')
             }
         });
     });
+
+// COMPONENT'S STORAGE --------------------------------------- 
+
+    app.route('/admin')
+        .get((req,res)=>{
+            res.sendFile('/pages/admin.html');
+        })
+        .post((req,res)=>{
+            const msgContent = req.body.message;
+            const publicityContent = req.body.isPublicity;
+            const titleContent = req.body.title;
+            const imgContent = req.body.image;
+            const videoContent = req.body.video;
+            const gifContent = req.body.gif;
+
+            const today = new Date();
+            const currentDate = today.getDate() + '-' + today.getMonth() + '-' + today.getFullYear();
+
+            const arrayContent = [imgContent, videoContent, gifContent];
+
+            const newPost = {
+                'title': titleContent,
+                'date': currentDate,
+                'isPublicity': publicityContent,
+                'message': msgContent,
+                'components': arrayContent
+            }
+
+            NewPost.insertMany([newPost], (err, posts) =>{
+                if(err){
+                    console.log(err);
+                }else{
+                    res.send('Post successfully added!');
+                }
+            })
+        })
+        .delete((req,res) =>{
+
+            const title = req.body.title;
+            NewPost.deleteOne({'title': title}, (err)=>{
+                if(err){
+                    console.log(err);
+                }else{
+                    console.log('Deletion successful!');
+                }
+            });
+        })
+        .put((req,res)=>{
+            const msgContent = req.body.message;
+            const publicityContent = req.body.isPublicity;
+            const titleContent = req.body.title;
+            const imgContent = req.body.image;
+            const videoContent = req.body.video;
+            const gifContent = req.body.gif;
+
+            const today = new Date();
+            const currentDate = today.getDate() + '-' + (today.getMonth() + 1) + '-' + today.getFullYear();
+
+            const arrayContent = [imgContent, videoContent, gifContent];
+
+            const newPost = {
+                'title': titleContent,
+                'date': currentDate,
+                'isPublicity': publicityContent,
+                'message': msgContent,
+                'components': arrayContent
+            }
+
+            NewPost.updateOne({'title': titleContent}, {newPost}, (err)=>{
+                if(err){
+                    console.log(err);
+                }else{
+                    console.log('Update successful!');
+                }
+            });
+        });
 
 // APP RUNNING ############################################
 
