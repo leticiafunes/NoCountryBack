@@ -4,7 +4,7 @@ const PortalNew = require("../models/PortalNew");
 
 newsCtrl.createNew = async (req, res) => {
 
-  const { title, subtitle, image, media_name, media_type, new_date } =  req.body;
+  const { title, subtitle, media_name, media_type, new_date } =  req.body;
   
   //Si viene un archivo adjunto, es en este parámetro
  
@@ -16,7 +16,6 @@ newsCtrl.createNew = async (req, res) => {
     const portalNew = new PortalNew({
         title,
         subtitle,
-        image,
         new_date, 
         media_name, 
         media_type 
@@ -40,7 +39,7 @@ newsCtrl.createNew = async (req, res) => {
 
 newsCtrl.updateNew = async (req, res) => {
 
-    const { title, subtitle, image, media_name, media_type, new_date } =  req.body;
+    const { title, subtitle,  media_name, media_type, new_date } =  req.body;
     const filter = { _id: req.params.id };
     console.log (req.body);
 
@@ -49,7 +48,6 @@ newsCtrl.updateNew = async (req, res) => {
    const portalNew = new PortalNew({
       title,
       subtitle,
-      image,
       new_date, 
       media_name, 
       media_type 
@@ -57,8 +55,8 @@ newsCtrl.updateNew = async (req, res) => {
 
     const result = PortalNew.findOneAndUpdate(
         filter,
-        {title, subtitle, image, new_date, media_name, media_type},
-        (err, { title, subtitle, image, new_date, media_name, media_type }) => {
+        {title, subtitle, new_date, media_name, media_type},
+        (err, { title, subtitle, new_date, media_name, media_type }) => {
           if (err)
             return res
               .status(500)
