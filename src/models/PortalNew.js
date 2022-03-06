@@ -1,5 +1,7 @@
 const {Schema, model} = require ('mongoose'); 
 
+const {appConfig} = require ('../config');
+
 
 const portalNewSchema = new Schema  ({
    
@@ -26,10 +28,23 @@ const portalNewSchema = new Schema  ({
     new_date: {
         type: Date,
     }, 
+
+    imgUrl: {
+        type: String,
+        
+    }
     
     },
     { timestamps: true}
     
     );
+
+    portalNewSchema.methods.setImgUrl = function setImgUrl (filename) {
+       //host + nombre de la imagen 
+       const {host, port} = appConfig
+
+       this.imgUrl = `${host}:${port}/public/${filename}`
+    }
+
 
     module.exports =  model ('PortalNew', portalNewSchema);

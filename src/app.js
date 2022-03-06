@@ -29,10 +29,11 @@ const users = require('./routes/users');
 const news = require('./routes/news');
 
 
-
 app.use('/auth', auth);
 app.use ('/api/users', users); 
 app.use ('/api/news', news); 
+app.use ('/public', express.static(`${__dirname}/storage/images`)); 
+
 
 module.exports = app;
 

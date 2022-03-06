@@ -5,6 +5,9 @@ const PortalNew = require("../models/PortalNew");
 newsCtrl.createNew = async (req, res) => {
 
   const { title, subtitle, image, media_name, media_type, new_date } =  req.body;
+  
+  //Si viene un archivo adjunto, es en este parámetro
+ 
  
 
     let messages = [];
@@ -18,6 +21,11 @@ newsCtrl.createNew = async (req, res) => {
         media_name, 
         media_type 
       });
+
+      if (req.file) {
+        const {filename} = req.file
+        portalNew.setImgUrl (filename);
+      }
 
       await portalNew.save((err) => {
         if (err)
