@@ -6,21 +6,14 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon src/index.js ",
-    "start": "nodemon src/index.js"
+    "start": "src/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-    "bcryptjs": "^2.4.3",
->>>>>>> users
-=======
-    "bcryptjs": "^2.4.3",
->>>>>>> a59d8ebb61f1374e1c7b2dbf915f1cd75ac86c8e
-    "body-parser": "^1.19.2",
+  "bcryptjs": "^2.4.3",
+   "body-parser": "^1.19.2",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "express": "^4.17.2",
