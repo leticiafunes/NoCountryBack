@@ -1,7 +1,7 @@
 const express = require ('express');
 const app = express();
 const cors  = require ('cors');
-
+const bodyParser = require('body-parser');
 
 
 require('passport')
@@ -14,15 +14,25 @@ app.set ('port', process.env.PORT || 4001);
 app.use (cors()); //cors hace q dos servidores se conecten entre ellos (back y front por ej)
 app.use (express.json()); //para q las rutas entiendan json y strings
 
-app.use(express.urlencoded({extended: true})); //Para que reconozca los body.req de un post
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({extended: true}))
+
+//Para usr form-data con postman y poder hacer put
+/*var expressBusboy = require('express-busboy');
+expressBusboy.extend(app);*/
+
 
 //routes
 
 const auth = require('./routes/auth');
 const users = require('./routes/users');
+const news = require('./routes/news');
+
+
 
 app.use('/auth', auth);
 app.use ('/api/users', users); 
+app.use ('/api/news', news); 
 
 module.exports = app;
 
