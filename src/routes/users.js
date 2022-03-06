@@ -32,4 +32,14 @@ router.route ('/private', passport.authenticate('jwt', { session: false }), (req
     res.status (200).send ({message: 'access allowed'})
 })
 
+
+router.route ('/logout')
+
+.post(function(req, res){
+    req.logout();
+    res.redirect('/');
+  });
+
+
+
 module.exports = router;

@@ -32,8 +32,8 @@ const news = require('./routes/news');
 app.use('/auth', auth);
 app.use ('/api/users', users); 
 app.use ('/api/news', news); 
+//Para ocultar la ruta donde se alamacenan laas imágenes
 app.use ('/public', express.static(`${__dirname}/storage/images`)); 
-
 
 module.exports = app;
 
