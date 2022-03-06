@@ -16,6 +16,11 @@ const portalNewSchema = new Schema  ({
         trim: true
     }, 
 
+    info: {
+        type: String,
+        
+    },
+
     media_name: {
         type: String,
         trim: true
@@ -38,13 +43,15 @@ const portalNewSchema = new Schema  ({
     { timestamps: true}
     
     );
+    
 
+    /*
     portalNewSchema.methods.setImgUrl = function setImgUrl (filename) {
        //host + nombre de la imagen 
        const {host, port} = appConfig
 
        this.imgUrl = `${host}:${port}/public/${filename}`
-    }
+    }*/
 
 
     module.exports =  model ('PortalNew', portalNewSchema);

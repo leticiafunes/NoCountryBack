@@ -4,7 +4,7 @@ const PortalNew = require("../models/PortalNew");
 
 newsCtrl.createNew = async (req, res) => {
 
-  const { title, subtitle, media_name, media_type, new_date } =  req.body;
+  const { title, subtitle, media_name, media_type, new_date, imgUrl, info } =  req.body;
   
   //Si viene un archivo adjunto, es en este parámetro
  
@@ -18,7 +18,9 @@ newsCtrl.createNew = async (req, res) => {
         subtitle,
         new_date, 
         media_name, 
-        media_type 
+        media_type, 
+        imgUrl, 
+        info
       });
 
       if (req.file) {
@@ -39,30 +41,22 @@ newsCtrl.createNew = async (req, res) => {
 
 newsCtrl.updateNew = async (req, res) => {
 
-    const { title, subtitle,  media_name, media_type, new_date } =  req.body;
+    const { title, subtitle,  media_name, media_type, new_date, imgUrl, info } =  req.body;
     const filter = { _id: req.params.id };
-    console.log (req.body);
+   
 
     let messages = [];
-
-   const portalNew = new PortalNew({
-      title,
-      subtitle,
-      new_date, 
-      media_name, 
-      media_type 
-    });
-
+    
     const result = PortalNew.findOneAndUpdate(
         filter,
-        {title, subtitle, new_date, media_name, media_type},
-        (err, { title, subtitle, new_date, media_name, media_type }) => {
+        {title, subtitle, new_date, media_name, media_type, imgUrl, info},
+        (err,  {title, subtitle, new_date, media_name, media_type, imgUrl, info}) => {
           if (err)
             return res
               .status(500)
               .send({ message: `Error updating new: ${err}` });
           messages.push({ type: "ok", text: "new updated." });
-          res.json(messages);
+          res.json(messages,title, subtitle, new_date, media_name, media_type, imgUrl, info);
         }
       );
     };
