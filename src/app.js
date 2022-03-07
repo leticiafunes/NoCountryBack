@@ -27,11 +27,14 @@ expressBusboy.extend(app);*/
 const auth = require('./routes/auth');
 const users = require('./routes/users');
 const news = require('./routes/news');
+const advertisements = require('./routes/advertisements');
 
 
 app.use('/auth', auth);
 app.use ('/api/users', users); 
 app.use ('/api/news', news); 
+app.use ('/api/advertisements', advertisements); 
+
 //Para ocultar la ruta donde se alamacenan laas imágenes
 app.use ('/public', express.static(`${__dirname}/storage/images`)); 
 

@@ -22,12 +22,12 @@ newsCtrl.createNew = async (req, res) => {
         imgUrl, 
         info
       });
-
+      /*
       if (req.file) {
         const {filename} = req.file
         portalNew.setImgUrl (filename);
       }
-
+      */
       await portalNew.save((err) => {
         if (err)
           return res
@@ -86,7 +86,7 @@ newsCtrl.updateNew = async (req, res) => {
   
   newsCtrl.getNewsByDate = async (req, res) => {
     
- 
+    console.log (req.query);
     const start  = req.query.fechainicio;
     const end  = req.query.fechafin; 
    
@@ -97,6 +97,7 @@ newsCtrl.updateNew = async (req, res) => {
             }
           });
           res.json(data);
+
       
   };
   
