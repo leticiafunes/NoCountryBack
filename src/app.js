@@ -16,6 +16,7 @@ app.use (express.json()); //para q las rutas entiendan json y strings
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}))
+app.use(express.static('public'));
 
 //Para usr form-data con postman y poder hacer put
 /*var expressBusboy = require('express-busboy');

@@ -12,7 +12,7 @@ const {signIn} = require('../controllers/auth');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.send('Hello World')
+  res.render ("index.html")
 })
 
 
