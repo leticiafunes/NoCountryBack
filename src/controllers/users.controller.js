@@ -5,7 +5,6 @@ const jwt = require('jsonwebtoken')
 const auth = require ('../middlewares/auth')
 
 
-//User Sign Up
 
 usersCtrl.createUser = async (req, res) => {
   let messages = [];
@@ -72,27 +71,19 @@ usersCtrl.createUser = async (req, res) => {
 
 usersCtrl.login = async (req, res, next) => {
 
-  
-  const { email, pass } = req.body;
-
-  console.log ("email: " +email);
-  console.log ("pass: " + pass);
-  console.log ( "req:" + req);
-
+  console.log (req.body);
+  const { email, password } = req.body;
 
   passport.authenticate('login', async (err, user, info) => {
     try {
-      
-  
-
-      if (err || !user) {
-        console.log(user)
-        const error = new Error('new Error')
-        console.log (err);
-        return next(error)
+     
+      if (err) {
+        //return next(err); // will generate a 500 error
+        return res.json({error: "error" })
       }
-      else {
-        console.log ("Usuario Existe");
+      if (! user) {
+       // return res.send({ success : false, message : 'authentication failed' });
+        return res.json({user: "user" })
       }
 
       //Passport exposes a login() function on req (also aliased as logIn()) that can be used to establish a login session.
@@ -100,7 +91,7 @@ usersCtrl.login = async (req, res, next) => {
         if (err) return next(err)
         const body = { _id: user._id, email: user.email }
         const token = jwt.sign({ user: body }, 'top_secret')
-        return res.json({ "user_token:" : token })
+        return res.json({user_token: token })
       })
     }
     catch(e) {
