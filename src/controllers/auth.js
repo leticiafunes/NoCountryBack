@@ -35,7 +35,7 @@ const signIn = async (req, res, next) => {
         if (err) return next(err)
         const body = { _id: user._id, email: user.email }
         const token = jwt.sign({ user: body }, process.env.CLAVE_ESTRATEGIA_LOCAL)
-        return res.json({ "user_token:" : token })
+        return res.json({ user_token : token })
       })
     }
     catch(e) {

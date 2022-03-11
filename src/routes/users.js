@@ -11,22 +11,29 @@ router.route ('/')
 //get ((req, res) => res.send ('Usuarios') )
 
 
-.get ( passport.authenticate('jwt', { session: false }), getUsers)
-.post (passport.authenticate('jwt', { session: false }), createUser )
+.get (getUsers)
 
+//.get ( passport.authenticate('jwt', { session: false }), getUsers)
+
+.post (createUser)
+//.post (passport.authenticate('jwt', { session: false }), createUser )
 
 router.route ('/login')
 .post (login)
 
 
 router.route ('/:id')
-.get (passport.authenticate('jwt', { session: false }),getUser)
-.delete (passport.authenticate('jwt', { session: false }), deleteUser )
-.put (passport.authenticate('jwt', { session: false }), updateUser)
+.get (getUser)
+.delete (deleteUser )
+.put (updateUser)
+
+//.get (passport.authenticate('jwt', { session: false }),getUser)
+//.delete (passport.authenticate('jwt', { session: false }), deleteUser )
+//.put (passport.authenticate('jwt', { session: false }), updateUser)
 
 router.route ('/userbyusername/:id')
-.get (passport.authenticate('jwt', { session: false }), getUserByUsername)
-
+.get (getUserByUsername)
+//.get (passport.authenticate('jwt', { session: false }), getUserByUsername)
 
 router.route ('/private', passport.authenticate('jwt', { session: false }), (req, res) => {
     res.status (200).send ({message: 'access allowed'})

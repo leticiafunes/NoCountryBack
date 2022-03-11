@@ -1,0 +1,36 @@
+        <div class="contenedor-form" >
+            
+            <div>
+              <a class="close" href="index.html" class="nav-links">X</a>
+            </div>
+    
+            
+            <div class="formulario">
+                <h2 class= "header-tittle">Login</h2>
+               
+            
+                <form onsubmit=" login(event)">
+                
+                
+                  <label for="text">Usuario</label>
+                  <input type="text" id="usuario" name="email"required value= "pepito@gmail.com">
+                  <label for="password">Contraseña</label>
+                  <input type="password" id="password" name= "password" value= "clave" maxlength=10 required>
+                  <input type="submit" value="Iniciar Sesión">
+                   
+                    
+                </form>
+
+
+
+
+
+
+                <div class="mensaje" id="mensaje">
+                    <label>Mensaje</label>
+                
+                </div>               
+            </div>
+           
+          
+        </div>
